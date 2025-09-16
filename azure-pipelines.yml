@@ -54,5 +54,5 @@ steps:
     appType: 'webAppLinux'
     appName: 'sales-frontend-app'
     resourceGroupName: 'sales-app-rg'
-    package: '$(Build.ArtifactStagingDirectory)/drop.zip'
+    package: '$(Build.ArtifactStagingDirectory)/*'
   displayName: 'Deploy to Azure Web App'
