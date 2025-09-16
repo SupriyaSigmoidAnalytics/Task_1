@@ -5,33 +5,44 @@ pool:
   name: supriya   # your self-hosted agent pool
 
 steps:
-- checkout: self   # download your repo first
+# Step 1: Checkout repo
+- checkout: self
 
-# Install Node.js
+# Step 2: Install Node.js
 - task: NodeTool@0
   inputs:
     versionSpec: '20.x'
   displayName: 'Install Node.js'
 
-# Build React frontend
+# Step 3: Build React frontend
 - script: |
     cd sales-frontend          # package.json is here
     npm install
     npm run build
   displayName: 'npm install and build React frontend'
 
-# Copy the React build folder to artifacts staging directory
+# Step 4: Copy React build artifacts
 - task: CopyFiles@2
   inputs:
-    SourceFolder: 'sales-frontend/build'       # correct build folder
-    Contents: '**/*'                           # copy everything inside build/
+    SourceFolder: 'sales-frontend/build'
+    Contents: '**/*'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
   displayName: 'Copy React build artifacts'
 
-# Publish artifacts so they can be used in release pipeline
+# Step 5: Publish build artifacts
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
     publishLocation: 'Container'
   displayName: 'Publish build artifacts'
+
+# Step 6: Deploy to Azure Web App
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'sales-frontend'   # your service connection
+    appType: 'webAppLinux'
+    appName: 'sales-frontend-app'
+    resourceGroupName: 'sales-app-rg'
+    package: '$(Build.ArtifactStagingDirectory)/**'   # deploy all artifacts
+  displayName: 'Deploy to Azure Web App'
