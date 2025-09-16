@@ -7,7 +7,7 @@ trigger:
 - master
 
 pool:
-  name:supriya
+  name: supriya
 
 steps:
 - task: NodeTool@0
