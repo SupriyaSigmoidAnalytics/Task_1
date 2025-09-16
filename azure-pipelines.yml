@@ -15,7 +15,7 @@ steps:
 
 # Build React frontend
 - script: |
-    cd sales-frontend/src
+    cd sales-frontend          # package.json is here
     npm install
     npm run build
   displayName: 'npm install and build React frontend'
@@ -23,7 +23,8 @@ steps:
 # Copy the React build folder to artifacts staging directory
 - task: CopyFiles@2
   inputs:
-    Contents: 'sales-frontend/src/build/**'   # copy everything inside build/
+    SourceFolder: 'sales-frontend/build'       # correct build folder
+    Contents: '**/*'                           # copy everything inside build/
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
   displayName: 'Copy React build artifacts'
 
