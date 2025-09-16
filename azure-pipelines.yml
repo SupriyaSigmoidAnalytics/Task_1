@@ -2,19 +2,35 @@ trigger:
 - master
 
 pool:
-  name: supriya
+  name: supriya   # your self-hosted agent pool
 
 steps:
-- checkout: self   # ✅ download your repo first
+- checkout: self   # download your repo first
 
+# Install Node.js
 - task: NodeTool@0
   inputs:
     versionSpec: '20.x'
   displayName: 'Install Node.js'
 
+# Build React frontend
 - script: |
     cd sales-frontend/src
     npm install
     npm run build
-  displayName: 'npm install and build'
+  displayName: 'npm install and build React frontend'
 
+# Copy the React build folder to artifacts staging directory
+- task: CopyFiles@2
+  inputs:
+    Contents: 'sales-frontend/src/build/**'   # copy everything inside build/
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+  displayName: 'Copy React build artifacts'
+
+# Publish artifacts so they can be used in release pipeline
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+  displayName: 'Publish build artifacts'
